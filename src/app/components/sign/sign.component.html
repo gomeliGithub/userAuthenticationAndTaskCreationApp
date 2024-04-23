@@ -1,0 +1,50 @@
+<form [formGroup]="signForm" novalidate (ngSubmit)="signFormSubmit()">
+    <div *ngIf="signOperation === 'up' && signForm.controls['clientLogin']" class="row mb-3">
+        <label for="inputLogin" class="col-sm-2 col-form-label">Логин</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin">
+        </div>
+        <div *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched" class="alert">
+            <span class="">Неккоректный логин</span>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
+        </div>
+        <div *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched" class="alert">
+            <span class="">Неккоректный email</span>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="inputPassword" class="col-sm-2 col-form-label">Пароль</label>
+        <div class="col-sm-10">
+            <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword">
+        </div>
+        <div *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched" class="alert">
+            <span class="">Неккоректный пароль</span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <button [disabled]="signForm.invalid" class="btn btn-primary">
+            {{ signOperation === 'up' ? 'Зарегистрироваться' : 'Войти' }}
+        </button>
+    </div>
+    <div class="mt-2 text-center">
+        <span *ngIf="signOperation === 'up'; else signInSpan" class="fw-bold">
+            У вас уже есть аккаунт?
+            (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" [routerLink]="[ '/sign/in' ]">
+                Войти
+            </a>)
+        </span>
+        <ng-template #signInSpan>  
+            <span class="fw-bold">
+                У вас ещё нет аккаунта?
+                (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" [routerLink]="[ '/sign/up' ]">
+                    Зарегистрироваться
+                </a>)
+            </span>
+        </ng-template>
+    </div>
+</form>

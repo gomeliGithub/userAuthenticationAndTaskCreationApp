@@ -1,0 +1,43 @@
+datasource db {
+    provider = "mysql"
+    url      = "mysql://root:KimChaehyun@localhost:3306/user_authentication_and_task_creation_app_db"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Admin {
+    id       Int    @id @default(autoincrement())
+    login    String
+    password String
+    type     String
+    email    String
+}
+
+model User {
+    id       Int    @id @default(autoincrement())
+    login    String @unique
+    password String
+    type     String
+    email    String
+    lastActiveDate DateTime?
+    lastSignInDate DateTime?
+    tasks     Task[]
+}
+
+model JWT_token {
+    token_hash      String   @id
+    issued_date     DateTime @default(now())
+    expires_date    DateTime
+    revokation_date DateTime
+    revoked         Boolean  @default(false)
+}
+
+model Task {
+    id          BigInt   @id
+    title       String
+    createdTime DateTime @default(now())
+    user        User     @relation(fields: [userId], references: [id])
+    userId      Int
+}
