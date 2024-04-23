@@ -75,7 +75,7 @@ export class JwtControlService {
                 expires_date,
                 revokation_date: expires_date
             }
-        });
+        });//
     }
 
     public async validateRevokedToken (token: string): Promise<boolean> {
