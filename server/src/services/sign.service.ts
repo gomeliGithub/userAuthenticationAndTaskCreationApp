@@ -63,7 +63,9 @@ export class SignService {
             request.activeClientData = clientData;
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
-        } else return false;
+        }
+
+        return true;
     }
 
     public async sign (request: IRequest, response: Response, operation: string, clientData: IClientSignData): Promise<string | void> {
