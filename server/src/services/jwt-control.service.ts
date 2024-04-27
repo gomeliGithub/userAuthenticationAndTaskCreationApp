@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { JWT_token } from '@prisma/client';
+import { JWT_tokens } from '@prisma/client';
 
 import * as crypto from 'crypto';
 import ms from 'ms';
@@ -21,7 +21,7 @@ export class JwtControlService {
     public extractTokenFromHeader (request: IRequest, throwError = true): string | undefined {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
-        if ( request.url !== "/api/sign/up" && request.url !== "/api/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/out" && !token ) {
+        if ( request.url !== '/api/sign/up' && request.url !== '/api/sign/in' && request.url !== '/api/sign/getActiveClient' && request.url !== '/api/sign/out' && !token ) {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
             else return undefined;
         }
@@ -41,7 +41,7 @@ export class JwtControlService {
 
         const client__secure_fgpHash: string = crypto.createHmac("SHA256", request.cookies['__secure_fgp']).digest('hex');
 
-        if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !( await this.validateRevokedToken(token) ) ) {
+        if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !( await this._validateRevokedToken(token) ) ) {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - secure fingerprint hash is invalid, token - ${ token }"`);
             else return null;
         }
@@ -50,12 +50,12 @@ export class JwtControlService {
     }
 
     public async addRevokedToken (token: string): Promise<void> {
-        const revokedTokenInstance: JWT_token | null = await this.checkRevokedTokenIs(token); 
+        const revokedTokenInstance: JWT_tokens | null = await this._checkRevokedTokenIs(token); 
 
         if ( !revokedTokenInstance ) {
             const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
-            await this._prisma.jWT_token.update({ where: { token_hash }, 
+            await this._prisma.jWT_tokens.update({ where: { token_hash }, 
                 data: { 
                     revokation_date: new Date(), 
                     revoked: true 
@@ -69,7 +69,7 @@ export class JwtControlService {
 
         const expires_date: Date = new Date(Date.now() + ms(process.env['JWT_EXPIRESIN_TIME'] as string));
 
-        await this._prisma.jWT_token.create({ 
+        await this._prisma.jWT_tokens.create({ 
             data: { 
                 token_hash,
                 expires_date,
@@ -78,8 +78,8 @@ export class JwtControlService {
         });
     }
 
-    public async validateRevokedToken (token: string): Promise<boolean> {
-        const revokedTokenInstance: JWT_token | null = await this.checkRevokedTokenIs(token);
+    private async _validateRevokedToken (token: string): Promise<boolean> {
+        const revokedTokenInstance: JWT_tokens | null = await this._checkRevokedTokenIs(token);
 
         if ( revokedTokenInstance ) {
             if ( new Date() > revokedTokenInstance.revokation_date ) return false;
@@ -88,10 +88,10 @@ export class JwtControlService {
         return true;
     }
 
-    public async checkRevokedTokenIs (token: string): Promise<JWT_token | null> {
+    private async _checkRevokedTokenIs (token: string): Promise<JWT_tokens | null> {
         const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
-        const revokedTokenData: JWT_token | null = await this._prisma.jWT_token.findFirst({ where: { token_hash, revoked: true } });
+        const revokedTokenData: JWT_tokens | null = await this._prisma.jWT_tokens.findFirst({ where: { token_hash, revoked: true } });
 
         return revokedTokenData;
     }

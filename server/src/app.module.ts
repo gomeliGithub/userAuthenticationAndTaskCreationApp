@@ -7,6 +7,7 @@ import bootstrap from 'src/main.server';
 import { join } from 'path';
 
 import { ClientModule } from './modules/client.module';
+import { WinstonModule } from './modules/winston.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -22,7 +23,8 @@ import { AppService } from './app.service';
             envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
             isGlobal: true
         }),
-        ClientModule
+        ClientModule,
+        WinstonModule
     ],
     controllers: [AppController],
     providers: [AppService],

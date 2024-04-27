@@ -12,11 +12,11 @@ export interface IClientSignData {
 }
 
 export interface IJWTPayload {
-    id: number;
-    login: string;
-    email: string;
+    id: number | null;
+    login: string | null;
+    email: string | null;
     type: 'admin' | 'user' | 'guest';
-    tasks: ITask[],
+    tasks: ITask[] | null,
     __secure_fgpHash: string;
     iat?: number;
     exp?: number;

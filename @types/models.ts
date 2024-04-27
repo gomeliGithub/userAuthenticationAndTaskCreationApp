@@ -1,6 +1,6 @@
-import { Prisma, User, Task, JWT_token, Admin } from "@prisma/client";
+import { Prisma, Users, Tasks, JWT_tokens, Admins } from "@prisma/client";
 
-export interface IAdmin extends Admin { }
-export interface IUser extends User, Prisma.UserGetPayload<{ include: { tasks: true } }> { }
-export interface ITask extends Task { }
-export interface IJWT_token extends JWT_token { }
+export interface IAdmin extends Admins { }
+export interface IUser extends Users, Prisma.UsersGetPayload<{ include: { tasks: true } }> { }
+export interface ITask extends Tasks { }
+export interface IJWT_token extends JWT_tokens { }

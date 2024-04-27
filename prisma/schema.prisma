@@ -7,7 +7,7 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model Admin {
+model Admins {
     id       Int    @id @default(autoincrement())
     login    String
     password String
@@ -15,7 +15,7 @@ model Admin {
     email    String
 }
 
-model User {
+model Users {
     id       Int    @id @default(autoincrement())
     login    String @unique
     password String
@@ -23,10 +23,10 @@ model User {
     email    String
     lastActiveDate DateTime?
     lastSignInDate DateTime?
-    tasks     Task[]
+    tasks     Tasks[]
 }
 
-model JWT_token {
+model JWT_tokens {
     token_hash      String   @id
     issued_date     DateTime @default(now())
     expires_date    DateTime
@@ -34,10 +34,10 @@ model JWT_token {
     revoked         Boolean  @default(false)
 }
 
-model Task {
+model Tasks {
     id          BigInt   @id
     title       String
     createdTime DateTime @default(now())
-    user        User     @relation(fields: [userId], references: [id])
+    user        Users    @relation(fields: [userId], references: [id])
     userId      Int
 }

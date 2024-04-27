@@ -1,11 +1,10 @@
 import { Request } from "express";
 
-import { IClientSignData } from "./sign";
-import { IAdmin, IUser } from "./models";
+import { IClientSignData, IJWTPayload } from "./sign";
 
 export interface IRequest extends Request {
     session: null;
-    activeClientData?: IAdmin | IUser;
+    activeClientData?: IJWTPayload;
 }
 
 export interface IRequestBody {

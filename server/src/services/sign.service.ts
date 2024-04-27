@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { Admin, Prisma, User } from '@prisma/client';
+import { Admins, Prisma, Users } from '@prisma/client';
 
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
@@ -17,7 +17,7 @@ import { generate__secure_fgp } from './sign.generateKeys';
 
 import { IRequest, IRequestBody } from 'types/global';
 import { IClientSignData, IJWTPayload } from 'types/sign';
-import { IUser } from 'types/models';
+import { IAdmin, IUser } from 'types/models';
 
 @Injectable()
 export class SignService {
@@ -43,7 +43,9 @@ export class SignService {
             const clientLogin: string = requestBody.sign.clientData.login.trim();
             const clientPassword: string = requestBody.sign.clientData.password.trim();
 
-            request.activeClientData = await this._signDataValidate(commonServiceRef, request, clientLogin, clientPassword);
+            const validatedClientData: IAdmin | IUser = await this._clientSignDataValidate(commonServiceRef, request, clientLogin, clientPassword);
+
+            this._setActiveClientData(request, validatedClientData);
 
             if ( token ) await this._jwtControlService.addRevokedToken(token);
 
@@ -53,14 +55,26 @@ export class SignService {
             const clientType: string | null = validatedClientPayload ? validatedClientPayload.type : null;
             const clientLogin: string | null = validatedClientPayload ? validatedClientPayload.login : null;
 
-            const clientData: Admin | User = ( await commonServiceRef.getClients({ where: { login: clientLogin as string }}, 'Admin' || 'User') )[0];
+            const existingClientData: IAdmin[] | IUser[] | null = ( await commonServiceRef.getClients({ where: { login: clientLogin as string }}, 'Admin' || 'User') );
 
-            if ( !clientData ) {
+            if ( !existingClientData ) {
                 if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload ? validatedClientPayload.login : '-' }"`);
-                else return false;
+                else {
+                    if ( request.activeClientData ) {
+                        request.activeClientData.id = null;
+                        request.activeClientData.login = null;
+                        request.activeClientData.email = null;
+                        request.activeClientData.type = 'guest';
+                        request.activeClientData.tasks = null;
+                    }
+
+                    this._setActiveClientData(request);
+
+                    return false;
+                }
             }
 
-            request.activeClientData = clientData;
+            this._setActiveClientData(request, existingClientData[0]);
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
@@ -77,7 +91,7 @@ export class SignService {
                 login: request.activeClientData.login,
                 email: request.activeClientData.email,
                 type: request.activeClientData.type as 'admin' | 'user' | 'guest',
-                tasks: request.activeClientData.type === 'user' ? ( request.activeClientData as IUser ).tasks : [],
+                tasks: request.activeClientData.type === 'user' ? request.activeClientData.tasks : null,
                 __secure_fgpHash: ""
             }
     
@@ -85,8 +99,8 @@ export class SignService {
     
             payload.__secure_fgpHash = __secure_fgpHash;
     
-            await commonServiceRef.registerUserLastLoginTime(payload.login);
-            await commonServiceRef.registerUserLastActivityTime(payload.login);
+            await commonServiceRef.registerUserLastLoginTime(payload.login as string);
+            await commonServiceRef.registerUserLastActivityTime(payload.login as string);
     
             const access_token: string = this._jwtService.sign(payload);
     
@@ -107,12 +121,12 @@ export class SignService {
         }
     }
 
-    private async _signDataValidate (commonServiceRef: CommonService, request: IRequest, clientLogin: string, clientPassword: string): Promise<Admin | User> {
-        const clientInstance: Admin | User = ( await commonServiceRef.getClients({ where: { login: clientLogin }}, 'Admin' || 'User') )[0];
+    private async _clientSignDataValidate (commonServiceRef: CommonService, request: IRequest, clientLogin: string, clientPassword: string): Promise<IAdmin | IUser> {
+        const clientInstance: IAdmin | IUser = ( await commonServiceRef.getClients({ where: { login: clientLogin }}, 'Admin' || 'User') )[0];
 
         console.log(await bcrypt.hash('12345Admin', parseInt(process.env['CLIENT_PASSWORD_BCRYPT_SALTROUNDS'] as string, 10)));
 
-        if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client instance does not exists"`);
+        if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "_clientSignDataValidate - client instance does not exists"`);
 
 
 
@@ -124,8 +138,18 @@ export class SignService {
 
         const passwordIsValid: boolean = await bcrypt.compare(clientPassword, clientInstance.password); 
 
-        if ( !passwordIsValid ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client password invalid"`);
+        if ( !passwordIsValid ) throw new UnauthorizedException(`${ request.url } "_clientSignDataValidate - client password invalid"`);
 
         return clientInstance;
+    }
+
+    private _setActiveClientData (request: IRequest, clientData?: IAdmin | IUser): void {
+        if ( request.activeClientData ) {
+            request.activeClientData.id = clientData ? clientData.id : null;
+            request.activeClientData.login = clientData ? clientData.login : null;
+            request.activeClientData.email = clientData ? clientData.email : null;
+            request.activeClientData.type = clientData ? clientData.type as 'admin' | 'user' : 'guest';
+            request.activeClientData.tasks = clientData && clientData.type === 'user' ? ( clientData as IUser ).tasks : null;
+        }
     }
 }

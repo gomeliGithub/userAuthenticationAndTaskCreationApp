@@ -16,6 +16,7 @@ import { JwtControlService } from '../services/jwt-control.service';
         useClass: SignGuard,
     }],
     controllers: [SignController],
-    exports: [ ClientService, SignService, JwtControlService ]
+    exports: [ ClientService, SignService, JwtControlService ],
+    imports: []
 })
 export class ClientModule {}
