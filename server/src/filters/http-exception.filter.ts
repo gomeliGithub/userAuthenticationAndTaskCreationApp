@@ -19,12 +19,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
         this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ message }`, true, 'http');
 
+
+
         const splittedMessage: string[] = message.split(' - ');
 
         const context: string = `${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } - ${ splittedMessage[0] }`;
         const correctMessage: string = splittedMessage[1];
 
         this._winstonService.error(correctMessage, '', context);
+
+
+        
 
         response.status(status).json({
             statusCode: status,
