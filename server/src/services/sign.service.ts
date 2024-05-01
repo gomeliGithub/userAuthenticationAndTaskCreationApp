@@ -110,8 +110,6 @@ export class SignService {
         } else if ( operation === 'up' ) {
             const { login, email, password } = clientData;
 
-            console.log(clientData);
-
             const passwordHash: string = await argon2.hash(password.trim(), { secret: Buffer.from(process.env.ARGON2_SECRETCODE as string) });
 
             await commonServiceRef.createUser({

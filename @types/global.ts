@@ -1,6 +1,7 @@
 import { Request } from "express";
 
 import { IClientSignData, IJWTPayload } from "./sign";
+import { ITask } from "./models";
 
 export interface IRequest extends Request {
     session: null;
@@ -27,6 +28,7 @@ export interface ICookieSerializeOptions {
 export interface IActiveClientData {
     login: string;
     email: string;
+    tasks: ITask[] | null;
 }
 
 export interface IAlert {
