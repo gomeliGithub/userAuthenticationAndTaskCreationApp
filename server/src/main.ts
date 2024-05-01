@@ -4,13 +4,18 @@ import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 
-import { generateCookieSecret, generateJWT_SecretCode } from './services/sign.generateKeys';
+import { generateArgon2Secret, generateCookieSecret, generateJWT_SecretCode } from './services/sign.generateKeys';
+
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+
+import { WinstonService } from './services/winston.service';
 
 async function bootstrap() {
+    process.env.JWT_SECRETCODE = generateJWT_SecretCode();
+    process.env.COOKIE_SECRET = generateCookieSecret();
+    process.env.ARGON2_SECRETCODE = generateArgon2Secret();
+    
     const app = await NestFactory.create(AppModule);
-
-    process.env['JWT_SECRETCODE'] = generateJWT_SecretCode();
-    process.env['COOKIE_SECRET'] = generateCookieSecret();
 
     app.use(cookieParser(process.env['COOKIE_SECRET']));
 
@@ -18,7 +23,11 @@ async function bootstrap() {
 
     app.enableShutdownHooks();
 
-    await app.listen(process.env['SERVER_API_PORT'] || 4000);
+    const winstonService = app.get(WinstonService);
+
+    app.useGlobalFilters(new HttpExceptionFilter(winstonService));
+
+    await app.listen(process.env.SERVER_API_PORT ?? process.env.PORT as string);
 }
 
 // Webpack will replace 'require' with '__webpack_require__'

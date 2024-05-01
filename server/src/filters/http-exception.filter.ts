@@ -17,24 +17,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const status: number = exception.getStatus();
         const message: string = exception.message;
 
-        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ message }`, true, 'http');
-
-
-
-        const splittedMessage: string[] = message.split(' - ');
-
-        const context: string = `${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } - ${ splittedMessage[0] }`;
-        const correctMessage: string = splittedMessage[1];
-
-        this._winstonService.error(correctMessage, '', context);
-
-
-        
+        this._winstonService.error(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT ?? process.env.PORT }] ${ status } - ${ message }`, '');
 
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
-            path: request.url,
+            path: request.url
         });
     }
 }

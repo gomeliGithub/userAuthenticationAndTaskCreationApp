@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+import { Observable } from 'rxjs';
 
 import { AppService } from '../app.service';
+
+import { IActiveClientData } from 'types/global';
 
 @Injectable({
     providedIn: 'root'
@@ -37,5 +41,13 @@ export class SignService {
             },
             error: () => this._appService.createAndAddErrorAlert()
         });
+    }
+
+    public signOut (): Observable<void> {
+        return this._http.put<void>('/api/sign/out', { }, { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
+    }
+
+    public getActiveClient (): Observable<IActiveClientData | null> {
+        return this._http.get<IActiveClientData | null>('/api/sign/getActiveClient', { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 }

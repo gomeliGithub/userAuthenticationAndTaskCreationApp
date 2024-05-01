@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
-import { Admin, Prisma, User } from '@prisma/client';
+import { Prisma, Users } from '@prisma/client';
 
 import { ClientModule } from '../modules/client.module';
 
 import { AppService } from '../app.service';
 import { ClientService } from './client.service';
 
-import { IGetUsersOptions } from 'types/options';
+import { IGetAdminsOptions, IGetUsersOptions } from 'types/options';
+import { IAdmin, IUser } from 'types/models';
 
 @Injectable()
 export class CommonService {
@@ -15,16 +16,16 @@ export class CommonService {
         private readonly _appService: AppService
     ) { }
 
-    public async getClients (options: IGetUsersOptions, clientType: 'Admin'): Promise<Admin[]>
-    public async getClients (options: IGetUsersOptions, clientType: 'User'): Promise<User[]>
-    public async getClients (options: IGetUsersOptions, clientType: 'Admin' | 'User'): Promise<Admin[] | User[]>
-    public async getClients (options: IGetUsersOptions, clientType: 'Admin' | 'User'): Promise<Admin[] | User[]> {
+    public async getClients (options: IGetAdminsOptions, clientType: 'admin'): Promise<IAdmin[]>
+    public async getClients (options: IGetUsersOptions, clientType: 'user'): Promise<IUser[]>
+    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin' | 'user'): Promise<IAdmin[] | IUser[]>
+    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin' | 'user'): Promise<IAdmin[] | IUser[]> {
         const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
 
         return clientServiceRef.getClients(options, clientType);
     }
 
-    public async createUser (data: Prisma.UserCreateInput): Promise<User> {
+    public async createUser (data: Prisma.UsersCreateInput): Promise<Users> {
         const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
 
         return clientServiceRef.createUser(data);

@@ -1,82 +1,75 @@
 import * as winston from 'winston';
 
+const consoleFormat = winston.format.printf(({ level, message, timestamp, stack }) => {
+    return `${timestamp} ${level}: ${stack || message}`;
+});
+
+const infoAndWarnFilter = winston.format((info, opts) => {
+    return info.level === "info" || info.level === "warn" ? info : false;
+});
+
+const errorFilter = winston.format((info, opts) => {
+    return info.level === "error" ? info : false;
+});
+
+const debugFilter = winston.format((info, opts) => {
+    return info.level === "debug" ? info : false;
+});
+
+const customLevels = {
+    levels: {
+        error: 0,
+        warn: 1,
+        info: 2,
+        debug: 3,
+        all: 4,
+    },
+    colors: {
+        error: "red",
+        warn: "yellow",
+        info: "green",
+        debug: "grey",
+        all: "white",
+    },
+};
+
 // Create transports instance
 const transports: winston.transport[] = [
     new winston.transports.Console({
-        handleExceptions: true,
-        stderrLevels: [ 'error', 'warn', 'info', 'http', 'debug' ],
-        consoleWarnLevels: [ 'warn', 'debug' ],
-        format: winston.format.combine(
-            // Add a timestamp to the console logs
-            winston.format.timestamp(),
-            // Add colors to you logs
-            winston.format.colorize(),
-            // What the details you need as logs
-            winston.format.printf(({ timestamp, level, message, context, trace }) => {
-                return `${ timestamp } [${ context }] ${ level }: ${ message }${ trace ? `\n${trace}` : '' }`;
-            }),
-        )
-    }),
-    new winston.transports.Http({
-        host: process.env.SERVER_DOMAIN,
-        port: parseInt(process.env.SERVER_API_PORT as string, 10), // but this defaults to port 80
-        path: "/api/v1/log",
-        auth: undefined,
-        ssl: false,
-        batch: false,
-        batchInterval: 5000,
-        batchCount: 10
+        level: "all",
+        format:  winston.format.combine(winston.format.colorize(), consoleFormat)
     }),
     new winston.transports.File({
-        filename: './logs/error.log',
+        filename: './server/logs/error.log',
         level: 'error',
-        format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-        )
+        format: winston.format.combine(errorFilter()) // _format
     }),
     new winston.transports.File({
-        filename: './logs/warning.log',
+        filename: './server/logs/warning.log',
         level: 'warn',
-        format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-        )
+        format: winston.format.combine(infoAndWarnFilter()) // _format
     }),
     new winston.transports.File({
-        filename: './logs/combined.log',
+        filename: './server/logs/info.log',
         level: 'info',
-        format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-        )
+        format: winston.format.combine(infoAndWarnFilter()) // _format
     }),
     new winston.transports.File({
-        filename: './logs/http.log',
-        level: 'http',
-        format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-        )
-    }),
-    new winston.transports.File({
-        filename: './logs/debug.log',
+        filename: './server/logs/debug.log',
         level: 'debug',
-        format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-        )
+        format: winston.format.combine(debugFilter()) // _format
     })
 ];
 
 // Create and export the logger instance
 export const logger = winston.createLogger({
+    levels: customLevels.levels,
+    format: winston.format.combine(
+        winston.format.timestamp({ format: "DD-MM-YYYY HH:mm:ss" }),
+        winston.format.errors({ stack: true }),
+        winston.format.json(),
+        consoleFormat
+    ),
     transports,
-    exceptionHandlers: [
-        new winston.transports.File({ filename: './logs/exceptions.log' })
-    ],
-    rejectionHandlers: [
-        new winston.transports.File({ filename: './logs/rejections.log' })
-    ],
     exitOnError: false
 });

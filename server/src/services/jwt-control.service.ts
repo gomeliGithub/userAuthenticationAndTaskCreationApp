@@ -15,7 +15,7 @@ import { IJWTPayload } from 'types/sign';
 export class JwtControlService {
     constructor (
         private readonly _prisma: PrismaService,
-        private readonly jwtService: JwtService
+        private readonly _jwtService: JwtService
     ) { }
     
     public extractTokenFromHeader (request: IRequest, throwError = true): string | undefined {
@@ -33,7 +33,7 @@ export class JwtControlService {
         let validatedClientPayload: IJWTPayload | null = null;
 
         try {
-            validatedClientPayload = await this.jwtService.verifyAsync<IJWTPayload>(token);
+            validatedClientPayload = await this._jwtService.verifyAsync<IJWTPayload>(token, { secret: process.env.JWT_SECRETCODE });
         } catch {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - access token is invalid, token - ${ token }"`);
             else return null;

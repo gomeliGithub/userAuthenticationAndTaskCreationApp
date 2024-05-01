@@ -17,10 +17,6 @@ export class WinstonService {
     public warn (message: string, context?: string) {
         logger.warn(message, { context });
     }
-
-    public http (message: string, context?: string) {
-        logger.http(message, { context });
-    }
     
     public debug (message: string, context?: string) {
         logger.debug(message, { context });

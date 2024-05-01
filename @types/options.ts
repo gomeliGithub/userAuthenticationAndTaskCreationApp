@@ -12,9 +12,9 @@ export interface IGetAdminsOptions extends ICommonGetOptions {
         email?: boolean,
         password?: boolean
     };
-    where?: Prisma.AdminWhereInput;
-    orderBy?: Prisma.AdminOrderByWithRelationInput;
-    cursor?: Prisma.AdminWhereUniqueInput;
+    where?: Prisma.AdminsWhereInput;
+    orderBy?: Prisma.AdminsOrderByWithRelationInput;
+    cursor?: Prisma.AdminsWhereUniqueInput;
 }
 
 export interface IGetUsersOptions extends ICommonGetOptions {
@@ -25,7 +25,7 @@ export interface IGetUsersOptions extends ICommonGetOptions {
         password?: boolean,
         tasks?: boolean
     };
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UsersWhereInput;
+    orderBy?: Prisma.UsersOrderByWithRelationInput;
+    cursor?: Prisma.UsersWhereUniqueInput;
 }

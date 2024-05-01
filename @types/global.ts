@@ -24,6 +24,11 @@ export interface ICookieSerializeOptions {
     secure?: boolean;
 }
 
+export interface IActiveClientData {
+    login: string;
+    email: string;
+}
+
 export interface IAlert {
 	type: 'success' | 'warning' | 'danger';
 	message: string;

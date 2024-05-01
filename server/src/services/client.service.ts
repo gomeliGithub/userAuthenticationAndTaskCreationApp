@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { Admins, Prisma, Users } from '@prisma/client';
+import { Prisma, Users } from '@prisma/client';
 
 import { PrismaService } from './prisma.service';
 
 import { IGetAdminsOptions, IGetUsersOptions } from 'types/options';
+import { IAdmin, IUser } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -12,14 +13,14 @@ export class ClientService {
         private readonly _prisma: PrismaService
     ) { }
 
-    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'Admin'): Promise<Admins[]>
-    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'User'): Promise<Users[]>
-    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'Admin' | 'User'): Promise<Admins[] | Users[]>
-    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'Admin' | 'User'): Promise<Admins[] | Users[]> {
-        let admins: Admins[] | null = [];
-        let users: Users[] | null = [];
+    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin'): Promise<IAdmin[]>
+    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'user'): Promise<IUser[]>
+    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin' | 'user'): Promise<IAdmin[] | IUser[]>
+    public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin' | 'user'): Promise<IAdmin[] | IUser[]> {
+        let admins: IAdmin[] | null = [];
+        let users: IUser[] | null = [];
 
-        if ( clientType === 'Admin' ) {
+        if ( clientType === 'admin' ) {
             const { select, where, orderBy, cursor, skip, take } = options as IGetAdminsOptions;
 
             admins = await this._prisma.admins.findMany({
@@ -30,7 +31,7 @@ export class ClientService {
                 skip,
                 take
             });
-        } else if ( clientType === 'User' ) {
+        } else if ( clientType === 'user' ) {
             const { select, where, orderBy, cursor, skip, take } = options as IGetUsersOptions;
 
             users = await this._prisma.users.findMany({
@@ -40,7 +41,7 @@ export class ClientService {
                 cursor,
                 skip,
                 take
-            });
+            }) as IUser[];
         }
 
         return admins.length !== 0 ? admins : users;
@@ -55,7 +56,7 @@ export class ClientService {
 
         const existingUser: Users | null = await this._prisma.users.findUnique({ where: { login: data.login }});
 
-        if ( existingUser ) throw new BadRequestException('CreateUser - user instance does exists'); 
+        if ( existingUser ) throw new BadRequestException('CreateUser - user instance does exists');
 
         return this._prisma.users.create({
             data

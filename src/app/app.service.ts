@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
 
-import { Alert } from 'types/global';
+import { IActiveClientData, IAlert } from 'types/global';
 
 @Injectable({
     providedIn: 'root'
@@ -12,8 +12,10 @@ export class AppService {
         private readonly _router: Router
     ) { }
 
-    public alertsAddChange: EventEmitter<Alert> = new EventEmitter();
-    public alertsCloseChange: EventEmitter<Alert> = new EventEmitter();
+    public activeClientDataChange: EventEmitter<IActiveClientData | null> = new EventEmitter();
+
+    public alertsAddChange: EventEmitter<IAlert> = new EventEmitter();
+    public alertsCloseChange: EventEmitter<IAlert> = new EventEmitter();
 
     public createAndAddSuccessAlert (message: string, closeTimeout: number = 3000): void {
         this.addAlert({ type: 'success', message, closeTimeout });
@@ -27,11 +29,15 @@ export class AppService {
         this.addAlert({ type: 'danger', message: message ?? 'Что-то пошло не так. Попробуйте ещё раз', closeTimeout });
     }
 
-    public addAlert (value: Alert): void {
+    public setActiveClientData (value: IActiveClientData | null): void {
+        this.activeClientDataChange.emit(value);
+    }
+
+    public addAlert (value: IAlert): void {
         this.alertsAddChange.emit(value);
     }
 
-    public closeAlert (value: Alert): void {
+    public closeAlert (value: IAlert): void {
         this.alertsCloseChange.emit(value);
     }
 

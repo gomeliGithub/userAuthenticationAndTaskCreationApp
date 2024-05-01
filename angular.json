@@ -54,6 +54,9 @@
                             "src/styles.css"
                         ],
                         "scripts": [],
+                        "allowedCommonJsDependencies": [
+                            "@nestjs/ng-universal/dist/tokens"
+                        ],
                         "preserveSymlinks": true
                     },
                     "configurations": {
@@ -122,7 +125,10 @@
                             "@nestjs/microservices/microservices-module",
                             "@nestjs/websockets",
                             "@nestjs/websockets/socket-module",
-                            "cache-manager"
+                            "@nestjs/common",
+                            "@nestjs/core",
+                            "cache-manager",
+                            "argon2"
                         ]
                     },
                     "configurations": {

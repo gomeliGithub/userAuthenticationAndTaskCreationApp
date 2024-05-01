@@ -17,7 +17,7 @@ export interface IJWTPayload {
     email: string | null;
     type: 'admin' | 'user' | 'guest';
     tasks: ITask[] | null,
-    __secure_fgpHash: string;
+    __secure_fgpHash?: string;
     iat?: number;
     exp?: number;
 }
