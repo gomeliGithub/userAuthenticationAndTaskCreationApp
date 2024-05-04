@@ -23,9 +23,19 @@ export interface IGetUsersOptions extends ICommonGetOptions {
         login?: boolean,
         email?: boolean,
         password?: boolean,
+        type?: boolean,
+        lastActiveDate?: boolean,
+        lastSignInDate?: boolean,
         tasks?: boolean
     };
     where?: Prisma.UsersWhereInput;
     orderBy?: Prisma.UsersOrderByWithRelationInput;
     cursor?: Prisma.UsersWhereUniqueInput;
+}
+
+export interface IGetUsersOptionsData {
+    login: string;
+    email: string;
+    skip: number;
+    take: number;
 }

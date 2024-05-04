@@ -18,6 +18,7 @@ import { PrismaService } from '../services/prisma.service';
         useClass: SignGuard,
     }],
     controllers: [SignController],
+    imports: [],
     exports: [ ClientService, SignService, JwtControlService ]
 })
 export class ClientModule {}

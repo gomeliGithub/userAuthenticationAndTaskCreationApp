@@ -5,7 +5,7 @@
             <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin">
         </div>
         <div *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched" class="alert">
-            <span class="">Неккоректный логин</span>
+            Неккоректный логин
         </div>
     </div>
     <div class="row mb-3">
@@ -14,7 +14,7 @@
             <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
         </div>
         <div *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched" class="alert">
-            <span class="">Неккоректный email</span>
+            Неккоректный email
         </div>
     </div>
     <div class="row mb-3">
@@ -23,7 +23,7 @@
             <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword">
         </div>
         <div *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched" class="alert">
-            <span class="">Неккоректный пароль</span>
+            Неккоректный пароль
         </div>
     </div>
     <div class="mb-3">

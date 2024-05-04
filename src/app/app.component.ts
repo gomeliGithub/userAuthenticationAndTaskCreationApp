@@ -7,6 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppService } from './app.service';
 import { SignService } from './services/sign.service';
+import { ClientService } from './services/client.service';
 
 import { IActiveClientData, IAlert } from 'types/global';
 
@@ -21,10 +22,11 @@ export class AppComponent implements OnInit {
     private _isBrowser: boolean;
 
     constructor (
-        @Inject(PLATFORM_ID) platformId: number,
+        @Inject(PLATFORM_ID) platformId: Object,
 
         private readonly _appService: AppService,
-        private readonly _signService: SignService
+        private readonly _signService: SignService,
+        private readonly _clientService: ClientService
     ) {
         this._isBrowser = isPlatformBrowser(platformId);
 
@@ -44,7 +46,7 @@ export class AppComponent implements OnInit {
                 next: clientData => {
                     this.activeClientData = clientData;
 
-                    this._appService.setActiveClientData(clientData);
+                    this._appService.activeClientData = clientData;
                 },
                 error: () => this._appService.createAndAddErrorAlert()
             });
@@ -66,5 +68,9 @@ export class AppComponent implements OnInit {
             next: () => this._appService.reloadComponent(false, '/'),
             error: () => this._appService.createAndAddErrorAlert()
         });
+    }
+
+    public changePasswordFormVisiableChange (): void {
+        this._clientService.changePasswordFormIsVisiable = !this._clientService.changePasswordFormIsVisiable;
     }
 }

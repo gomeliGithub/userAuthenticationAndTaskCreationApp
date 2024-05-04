@@ -53,19 +53,11 @@ export class SignService {
             const clientType: string | null = validatedClientPayload ? validatedClientPayload.type : null;
             const clientLogin: string | null = validatedClientPayload ? validatedClientPayload.login : null;
 
-            const existingClientData: IAdmin[] | IUser[] | null = ( await commonServiceRef.getClients({ where: { login: clientLogin as string }}, 'admin' || 'user') );
+            const existingClientData: IAdmin[] | IUser[] | null = validatedClientPayload ? ( await commonServiceRef.getClients({ where: { login: clientLogin as string }}, 'admin' || 'user') ) : null;
 
             if ( !existingClientData ) {
                 if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload ? validatedClientPayload.login : '-' }"`);
                 else {
-                    if ( request.activeClientData ) {
-                        request.activeClientData.id = null;
-                        request.activeClientData.login = null;
-                        request.activeClientData.email = null;
-                        request.activeClientData.type = 'guest';
-                        request.activeClientData.tasks = null;
-                    }
-
                     request.activeClientData = this._setActiveClientData(request);
 
                     return false;
@@ -143,10 +135,27 @@ export class SignService {
         const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
         if ( validatedClientPayload ) {
-            const clientData: IAdmin | IUser = ( await commonServiceRef.getClients({ where: { login: validatedClientPayload.login as string }}, 'admin' || 'user') )[0];
+            const clientData: IAdmin | IUser = ( await commonServiceRef.getClients({
+                select: {
+                    login: true,
+                    email: true,
+                    tasks: true,
+                    id: false,
+                    password: false,
+                    type: false,
+                    lastActiveDate: false,
+                    lastSignInDate: false
+                },
+                where: { login: validatedClientPayload.login as string }
+            }, 'admin' || 'user') )[0];
 
             if ( !clientData ) throw new UnauthorizedException(`${ request.url } "GetActiveClient - client instance does not exists"`);
         }
+
+        validatedClientPayload.id = null;
+        
+        delete validatedClientPayload.exp;
+        delete validatedClientPayload.iat;
 
         return validatedClientPayload;
     }

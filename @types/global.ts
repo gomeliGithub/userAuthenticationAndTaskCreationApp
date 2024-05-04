@@ -1,7 +1,7 @@
 import { Request } from "express";
 
 import { IClientSignData, IJWTPayload } from "./sign";
-import { ITask } from "./models";
+import { ITask, IUser } from "./models";
 
 export interface IRequest extends Request {
     session: null;
@@ -12,6 +12,10 @@ export interface IRequestBody {
 	sign?: {
         operation: string;
 		clientData: IClientSignData;
+    },
+    client?: {
+        userLogin?: string;
+        userPassword?: string;
     }
 }
 
@@ -25,6 +29,11 @@ export interface ICookieSerializeOptions {
     secure?: boolean;
 }
 
+export interface IGetUsersData {
+    users: IUser[];
+    moreUsersAreExists: boolean;
+}
+
 export interface IActiveClientData {
     login: string;
     email: string;
@@ -35,4 +44,23 @@ export interface IAlert {
 	type: 'success' | 'warning' | 'danger';
 	message: string;
 	closeTimeout: number;
+}
+
+export type SortColumn = keyof IUser | '';
+export type SortDirection = 'asc' | 'desc' | '';
+
+export interface SortEvent {
+    column: SortColumn;
+	direction: SortDirection;
+}
+
+export interface SearchResult {
+	users: IUser[];
+	total: number;
+}
+
+export interface State {
+	searchTerm: string;
+	sortColumn: SortColumn;
+	sortDirection: SortDirection;
 }

@@ -1,1 +1,14 @@
 <p>Основная страница</p>
+<div *ngIf="changePasswordFormIsVisiable" class="align-self-center mt-3 w-50">
+    <form [formGroup]="changePasswordForm" class="" novalidate (submit)="changePasswordSubmit()">
+        <div class="form-group form-floating mb-3">
+            <input type="password" class="form-control" id="inputNewPasswordDescription" formControlName="newPassword">
+            <label for="inputNewPasswordDescription" class="form-label">Новый пароль</label>
+        </div>
+        <div class="form-group text-center">
+            <button class="btn btn-primary" [disabled]="changePasswordForm.invalid">
+                Сменить
+            </button>
+        </div>
+    </form>
+</div>

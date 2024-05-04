@@ -45,7 +45,18 @@ export class SignComponent {
                 'clientPassword': new FormControl('', Validators.required)
             };
 
-            if ( this.signOperation === 'up' ) formControls['clientLogin'] = new FormControl('', [ Validators.required ])
+            if ( this.signOperation === 'up' ) {
+                formControls['clientLogin'] = new FormControl('', [ 
+                    Validators.required, 
+                    Validators.pattern(/^[a-zA-Z](.[a-zA-Z0-9_-]*)$/) 
+                ]);
+
+                formControls['clientPassword'].addValidators(Validators.pattern(/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}/g));
+            } else if ( this.signOperation === 'in' ) {
+                delete formControls['clientLogin'];
+
+                formControls['clientPassword'].removeValidators(Validators.pattern(/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}/g));
+            }
 
             this.signForm = new FormGroup(formControls);
         });

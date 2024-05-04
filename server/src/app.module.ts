@@ -11,7 +11,9 @@ import * as argon2 from "argon2";
 import { join } from 'path';
 
 import { ClientModule } from './modules/client.module';
+import { AdminDashboardModule } from './modules/admin-dashboard.module';
 import { WinstonModule } from './modules/winston.module';
+import { CommonModule } from './modules/common.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -48,7 +50,9 @@ import { IAdmin } from 'types/models';
             }
         }),
         ClientModule,
-        WinstonModule
+        AdminDashboardModule,
+        WinstonModule,
+        CommonModule
     ],
     controllers: [AppController],
     providers: [ AppService, PrismaService ]

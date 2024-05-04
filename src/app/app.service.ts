@@ -12,10 +12,10 @@ export class AppService {
         private readonly _router: Router
     ) { }
 
-    public activeClientDataChange: EventEmitter<IActiveClientData | null> = new EventEmitter();
-
     public alertsAddChange: EventEmitter<IAlert> = new EventEmitter();
     public alertsCloseChange: EventEmitter<IAlert> = new EventEmitter();
+
+    public activeClientData: IActiveClientData | null;
 
     public createAndAddSuccessAlert (message: string, closeTimeout: number = 3000): void {
         this.addAlert({ type: 'success', message, closeTimeout });
@@ -27,10 +27,6 @@ export class AppService {
 
     public createAndAddErrorAlert (message?: string, closeTimeout: number = 3000): void {
         this.addAlert({ type: 'danger', message: message ?? 'Что-то пошло не так. Попробуйте ещё раз', closeTimeout });
-    }
-
-    public setActiveClientData (value: IActiveClientData | null): void {
-        this.activeClientDataChange.emit(value);
     }
 
     public addAlert (value: IAlert): void {

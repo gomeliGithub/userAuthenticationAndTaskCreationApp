@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { Prisma, Users } from '@prisma/client';
+import * as argon2 from "argon2";
 
+import { Prisma, Users } from '@prisma/client';
 import { PrismaService } from './prisma.service';
 
 import { IGetAdminsOptions, IGetUsersOptions } from 'types/options';
@@ -47,10 +48,19 @@ export class ClientService {
         return admins.length !== 0 ? admins : users;
     }
 
+    public async getClientsCommonCount (clientType: 'admin' | 'user'): Promise<number> {
+        let commonCount: number = 0;
+
+        if ( clientType === 'admin' ) commonCount = await this._prisma.users.count();
+        else if ( clientType === 'user' ) commonCount = await this._prisma.admins.count();
+
+        return commonCount;
+    }
+
     public async createUser (data: Prisma.UsersCreateInput): Promise<Users> {
         data.login = data.login.trim();
         data.email = data.email.trim();
-        data.password.trim();
+        data.password = data.password.trim();
 
         data.type = 'user';
 
@@ -76,5 +86,11 @@ export class ClientService {
 
     public async registerUserLastLoginTime (userLogin: string): Promise<void> {
         await this.updateUser(userLogin, { lastSignInDate: new Date() });
+    }
+
+    public async changeUserPassword (userLogin: string, newPassword: string): Promise<void> {
+        const passwordHash: string = await argon2.hash(newPassword.trim(), { secret: Buffer.from(process.env.ARGON2_SECRETCODE as string) });
+        
+        this.updateUser(userLogin, { password: passwordHash });
     }
 }
