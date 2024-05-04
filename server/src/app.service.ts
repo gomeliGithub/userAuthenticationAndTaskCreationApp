@@ -26,7 +26,7 @@ export class AppService {
         secure: false,
         priority: 'high'
     }
-
+    // 'Ленивая' загрузка сервисов
     public async getServiceRef ( module: typeof ClientModule, service: typeof ClientService): Promise<ClientService>
     public async getServiceRef ( module: typeof ClientModule, service: typeof SignService): Promise<SignService>
     public async getServiceRef ( module: typeof ClientModule, service: typeof JwtControlService): Promise<JwtControlService>

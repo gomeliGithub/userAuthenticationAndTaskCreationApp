@@ -13,7 +13,7 @@ export class ClientService {
     constructor (
         private readonly _prisma: PrismaService
     ) { }
-
+    // Функция для получения данных зарегистрированных администраторов и пользователей
     public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin'): Promise<IAdmin[]>
     public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'user'): Promise<IUser[]>
     public async getClients (options: IGetAdminsOptions | IGetUsersOptions, clientType: 'admin' | 'user'): Promise<IAdmin[] | IUser[]>
@@ -47,7 +47,7 @@ export class ClientService {
 
         return admins.length !== 0 ? admins : users;
     }
-
+    // Функция для получения количества зарегистрированных администраторов и пользователей
     public async getClientsCommonCount (clientType: 'admin' | 'user'): Promise<number> {
         let commonCount: number = 0;
 
@@ -56,7 +56,7 @@ export class ClientService {
 
         return commonCount;
     }
-
+    // Функция для создания пользователя
     public async createUser (data: Prisma.UsersCreateInput): Promise<Users> {
         data.login = data.login.trim();
         data.email = data.email.trim();
@@ -72,22 +72,22 @@ export class ClientService {
             data
         });
     }
-
+    // Функция для обновления данных пользователя
     public async updateUser (userLogin: string, data: Prisma.UsersUpdateInput): Promise<Users> {
         return this._prisma.users.update({
             where: { login: userLogin },
             data
         });
     }
-
+    // Функция для регистрации последних действий пользователя
     public async registerUserLastActivityTime (userLogin: string): Promise<void> {
         await this.updateUser(userLogin, { lastActiveDate: new Date() });
     }
-
+    // Функция для регистрации последней авторизации пользователя в аккаунт
     public async registerUserLastLoginTime (userLogin: string): Promise<void> {
         await this.updateUser(userLogin, { lastSignInDate: new Date() });
     }
-
+    // Функция для смены пароля пользователя
     public async changeUserPassword (userLogin: string, newPassword: string): Promise<void> {
         const passwordHash: string = await argon2.hash(newPassword.trim(), { secret: Buffer.from(process.env.ARGON2_SECRETCODE as string) });
         

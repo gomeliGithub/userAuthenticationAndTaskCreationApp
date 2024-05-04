@@ -17,7 +17,7 @@ export class JwtControlService {
         private readonly _prisma: PrismaService,
         private readonly _jwtService: JwtService
     ) { }
-    
+    // Функция для получения токена из заголовка
     public extractTokenFromHeader (request: IRequest, throwError = true): string | undefined {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
@@ -28,7 +28,7 @@ export class JwtControlService {
         
         return type === 'Bearer' ? token : undefined;
     }
-
+    // Функция для 'валидации' токена
     public async tokenValidate (request: IRequest, token: string, throwError = true): Promise<IJWTPayload | null> {
         let validatedClientPayload: IJWTPayload | null = null;
 
@@ -48,11 +48,11 @@ export class JwtControlService {
 
         return validatedClientPayload;
     }
-
+    // Функция для добавления токена в список 'просроченных'
     public async addRevokedToken (token: string): Promise<void> {
-        const revokedTokenInstance: JWT_tokens | null = await this._checkRevokedTokenIs(token); 
+        const revokedTokenData: JWT_tokens | null = await this._checkRevokedTokenIs(token); 
 
-        if ( !revokedTokenInstance ) {
+        if ( !revokedTokenData ) {
             const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
             await this._prisma.jWT_tokens.update({ where: { token_hash }, 
@@ -63,7 +63,7 @@ export class JwtControlService {
             });
         }
     }
-
+    // Функция для сохранения токена в БД
     public async saveToken (token: string): Promise<void> {
         const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
@@ -77,17 +77,17 @@ export class JwtControlService {
             }
         });
     }
-
+    // Функция для проверки токена на 'просроченность'
     private async _validateRevokedToken (token: string): Promise<boolean> {
-        const revokedTokenInstance: JWT_tokens | null = await this._checkRevokedTokenIs(token);
+        const revokedTokenData: JWT_tokens | null = await this._checkRevokedTokenIs(token);
 
-        if ( revokedTokenInstance ) {
-            if ( new Date() > revokedTokenInstance.revokation_date ) return false;
+        if ( revokedTokenData ) {
+            if ( new Date() > revokedTokenData.revokation_date ) return false;
         }
 
         return true;
     }
-
+    // Функция для поиска и получения 'просроченного' токена
     private async _checkRevokedTokenIs (token: string): Promise<JWT_tokens | null> {
         const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 

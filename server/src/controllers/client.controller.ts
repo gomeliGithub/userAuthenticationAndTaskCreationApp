@@ -9,7 +9,7 @@ export class ClientController {
     constructor (
         private readonly _clientService: ClientService
     ) { }
-
+    // Ендпоинт для смены пароля пользователя
     @Put('/changeUserPassword')
     public async changeUserPassword (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;

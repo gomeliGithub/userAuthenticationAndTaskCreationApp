@@ -11,7 +11,7 @@ export class SignGuard implements CanActivate {
         private signService: SignService, 
         private reflector: Reflector
     ) { }
-
+    // Проверка доступа к защищенным ресурсам
     async canActivate (context: ExecutionContext): Promise<boolean> {
         const clientTypes: string[] = this.reflector.getAllAndOverride<string[]>('client-types', [
             context.getHandler(),

@@ -26,7 +26,7 @@ export class PrismaService extends PrismaClient<Prisma.PrismaClientOptions, 'que
             ]
         });
     }
-
+    // Подключение к БД
     async onModuleInit (): Promise<void> {
         this.$on('query', event => {
             console.log('Query: ' + event.query)

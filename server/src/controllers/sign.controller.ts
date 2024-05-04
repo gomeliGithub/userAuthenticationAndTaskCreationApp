@@ -12,7 +12,7 @@ import { IJWTPayload } from 'types/sign';
 @Controller('sign')
 export class SignController {
     constructor (private readonly _signService: SignService) { }
-
+    // Ендпоинт для регистрации и авторизации пользователя и авторизации администратора
     @Post('/process')
     @ClientTypes('admin', 'user', 'guest')
     async sign (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string | void> {
@@ -28,12 +28,12 @@ export class SignController {
 
         return this._signService.sign(request, response, requestBody.sign.operation, requestBody.sign.clientData);
     }
-
+    // Ендпоинт для 'гашения' текущего токена авторизованного клиента
     @Put('/out')
     async signOut (@Req() request: IRequest): Promise<void> {
         return this._signService.signOut(request);
     }
-
+    // Ендпоинт для получения данных текущего активного клиента
     @Get('/getActiveClient')
     async getActiveClient (@Req() request: IRequest): Promise<IJWTPayload | null> {
         return this._signService.getActiveClient(request);

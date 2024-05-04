@@ -14,7 +14,7 @@ export class AdminDashboardService {
     constructor (
         private readonly _appService: AppService,
     ) { }
-
+    // Функция для проверки доступа к странице администратора
     public async checkAccess (request: IRequest, __secure_fgp: string): Promise<boolean> {
         if ( !__secure_fgp || __secure_fgp === '' ) return false;
 
@@ -24,7 +24,7 @@ export class AdminDashboardService {
 
         return validateClientAuthResult;
     }
-
+    // Функция для получения данных зарегистрированных пользователей
     public async getUsersData (request: IRequest, optionsData: IGetUsersOptionsData): Promise<IGetUsersData> {
         const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 

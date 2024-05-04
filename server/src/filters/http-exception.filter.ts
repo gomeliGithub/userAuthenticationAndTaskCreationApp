@@ -9,7 +9,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     constructor (
         private readonly _winstonService: WinstonService
     ) { }
-
+    // Логирование http ошибок
     catch (exception: HttpException, host: ArgumentsHost) {
         const ctx: HttpArgumentsHost = host.switchToHttp();
         const response: Response = ctx.getResponse<Response>();

@@ -25,7 +25,7 @@ export class SignService {
         private readonly _appService: AppService,
         private readonly _jwtControlService: JwtControlService
     ) { }
-
+    // Функция для проверки доступа к защищенным ресурсам
     public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true, commonServiceRef?: CommonService): Promise<boolean> {
         if ( !commonServiceRef ) commonServiceRef = await this._appService.getServiceRef(CommonModule, CommonService);
 
@@ -41,8 +41,6 @@ export class SignService {
 
             if ( requestBody.sign?.operation === 'in' ) validatedClientData = await this._clientSignDataValidate(commonServiceRef, request, clientEmail, clientPassword, requestBody.sign.operation);
 
-            request.activeClientData = this._setActiveClientData(request, validatedClientData);
-
             if ( token ) await this._jwtControlService.addRevokedToken(token);
 
             return true;
@@ -57,19 +55,15 @@ export class SignService {
 
             if ( !existingClientData ) {
                 if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload ? validatedClientPayload.login : '-' }"`);
-                else {
-                    request.activeClientData = this._setActiveClientData(request);
-
-                    return false;
-                }
-            } else request.activeClientData = this._setActiveClientData(request, existingClientData[0]);
+                else return false;
+            }
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
 
         return true;
     }
-
+    // Функция для регистрации и авторизации пользователя и авторизации администратора
     public async sign (request: IRequest, response: Response, operation: string, clientData: IClientSignData): Promise<string | void> {
         const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
@@ -112,7 +106,7 @@ export class SignService {
             });
         }
     }
-
+    // Функция для 'гашения' текущего токена авторизованного клиента
     public async signOut (request: IRequest): Promise<void> {
         const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request);
 
@@ -120,7 +114,7 @@ export class SignService {
 
         return this._jwtControlService.addRevokedToken(token);
     }
-
+    // Функция для получения данных текущего активного клиента
     public async getActiveClient (request: IRequest): Promise<IJWTPayload | null> {
         const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request);
 
@@ -159,7 +153,7 @@ export class SignService {
 
         return validatedClientPayload;
     }
-
+    // Функция для валидации пароля клиента
     private async _clientSignDataValidate (commonServiceRef: CommonService, request: IRequest, clientEmail: string, clientPassword: string, operation: string): Promise<IAdmin | IUser | undefined> {
         const clientData: IAdmin | IUser | undefined = ( await commonServiceRef.getClients({ where: { email: clientEmail }}, 'admin' || 'user') )[0];
 
@@ -173,17 +167,5 @@ export class SignService {
         }
 
         return clientData;
-    }
-
-    private _setActiveClientData (request: IRequest, clientData?: IAdmin | IUser): IJWTPayload {
-        const activeClientDataPayload: IJWTPayload = {
-            id: clientData ? clientData.id : null,
-            login: clientData ? clientData.login : null,
-            email: clientData ? clientData.email : null,
-            type: clientData ? clientData.type as 'admin' | 'user' : 'guest',
-            tasks: clientData && clientData.type === 'user' ? ( clientData as IUser ).tasks : null
-        };
-
-        return activeClientDataPayload;
     }
 }

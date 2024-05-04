@@ -12,12 +12,12 @@ export class AdminDashboardController {
     constructor (
         private readonly _adminDashboardService: AdminDashboardService
     ) { }
-
+    // Ендпоинт для проверки доступа к странице администратора
     @Get('/checkAccess')
     public async checkAccess (@Req() request: IRequest, @Cookies('__secure_fgp') __secure_fgp: string): Promise<boolean> {
         return this._adminDashboardService.checkAccess(request, __secure_fgp);
     }
-    
+    // Ендпоинт для получения данных зарегистрированных пользователей
     @Get('/getUsersData')
     @ClientTypes('admin')
     public async getUsersData (@Req() request: IRequest,
