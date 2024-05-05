@@ -1,6 +1,6 @@
 datasource db {
     provider = "mysql"
-    url      = "mysql://root:KimChaehyun@localhost:3306/user_authentication_and_task_creation_app_db"
+    url      = env("DATABASE_URL")
 }
 
 generator client {

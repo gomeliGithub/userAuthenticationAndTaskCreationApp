@@ -3,6 +3,7 @@ import { AngularUniversalModule } from '@nestjs/ng-universal';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule, JwtSecretRequestType } from '@nestjs/jwt';
 import { Algorithm } from 'jsonwebtoken';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import bootstrap from 'src/main.server';
 
@@ -10,6 +11,8 @@ import * as argon2 from "argon2";
 
 import { join } from 'path';
 
+import { TasksModule } from './modules/tasks.module';
+import { PrismaModule } from './modules/prisma.module';
 import { ClientModule } from './modules/client.module';
 import { AdminDashboardModule } from './modules/admin-dashboard.module';
 import { WinstonModule } from './modules/winston.module';
@@ -19,6 +22,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { PrismaService } from './services/prisma.service';
+import { TasksService } from './services/tasks.service';
+
 import { IAdmin } from 'types/models';
 
 @Module({
@@ -49,16 +54,21 @@ import { IAdmin } from 'types/models';
                 }
             }
         }),
+        ScheduleModule.forRoot(),
+        TasksModule,
+        PrismaModule,
         ClientModule,
         AdminDashboardModule,
         WinstonModule,
         CommonModule
     ],
     controllers: [AppController],
-    providers: [ AppService, PrismaService ]
+    providers: [ AppService, PrismaService, TasksService ]
 })
 export class AppModule {
-    constructor (private readonly _prisma: PrismaService) { 
+    constructor (
+        private readonly _prisma: PrismaService
+    ) { 
         this._createOrUpdateMainAdmin();
     }
 

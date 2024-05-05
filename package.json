@@ -32,6 +32,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/ng-universal": "^8.0.0",
     "@nestjs/platform-express": "^10.3.7",
+    "@nestjs/schedule": "^4.0.2",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
     "@popperjs/core": "^2.11.8",
     "@prisma/client": "^5.12.1",

@@ -6,7 +6,7 @@ import { Prisma, Users } from '@prisma/client';
 import { PrismaService } from './prisma.service';
 
 import { IGetAdminsOptions, IGetUsersOptions } from 'types/options';
-import { IAdmin, IUser } from 'types/models';
+import { IAdmin, ITask, IUser } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -51,8 +51,8 @@ export class ClientService {
     public async getClientsCommonCount (clientType: 'admin' | 'user'): Promise<number> {
         let commonCount: number = 0;
 
-        if ( clientType === 'admin' ) commonCount = await this._prisma.users.count();
-        else if ( clientType === 'user' ) commonCount = await this._prisma.admins.count();
+        if ( clientType === 'admin' ) commonCount = await this._prisma.admins.count();
+        else if ( clientType === 'user' ) commonCount = await this._prisma.users.count();
 
         return commonCount;
     }
@@ -78,6 +78,16 @@ export class ClientService {
             where: { login: userLogin },
             data
         });
+    }
+    // Функция для создания 'задания' пользователя
+    public async createUserTask (userLogin: string, data: Prisma.TasksCreateInput): Promise<void> {
+        const newTask: ITask = await this._prisma.tasks.create({ 
+            data
+        });
+
+        // this.updateUser(userLogin, { tasks: {
+        //      connect: { id: newTask.id }
+        // }});
     }
     // Функция для регистрации последних действий пользователя
     public async registerUserLastActivityTime (userLogin: string): Promise<void> {

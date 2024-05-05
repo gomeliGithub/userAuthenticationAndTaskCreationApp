@@ -56,4 +56,10 @@ export class CommonService {
 
         return clientServiceRef.registerUserLastLoginTime(userLogin);
     }
+    // 'Ленивая' загрузка функции для создания 'задания' пользователя
+    public async createUserTask (userLogin: string, data: Prisma.TasksCreateInput): Promise<void> {
+        const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
+
+        return clientServiceRef.createUserTask(userLogin, data);
+    }
 }

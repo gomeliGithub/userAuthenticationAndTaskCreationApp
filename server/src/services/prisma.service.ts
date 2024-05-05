@@ -3,7 +3,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'info' | 'warn' | 'error'> implements OnModuleInit {
+export class PrismaService extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'info' | 'warn' | 'error'> { // implements OnModuleInit
     constructor () {
         super({
             log: [
@@ -26,7 +26,7 @@ export class PrismaService extends PrismaClient<Prisma.PrismaClientOptions, 'que
             ]
         });
     }
-    // Подключение к БД
+    
     async onModuleInit (): Promise<void> {
         this.$on('query', event => {
             console.log('Query: ' + event.query)
@@ -34,6 +34,6 @@ export class PrismaService extends PrismaClient<Prisma.PrismaClientOptions, 'que
             console.log('Duration: ' + event.duration + 'ms')
         });
         
-        await this.$connect();
+        // await this.$connect();
     }
 }
